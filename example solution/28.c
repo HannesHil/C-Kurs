@@ -16,7 +16,7 @@ char * Wort;
 char * Gemachte;
 char * WortDarstell;
 
-void darstellung() {
+void MaleHangman() {
     printf("\n\n");
     if (Fehler >= 6) {
         printf("      ------\n");
@@ -166,15 +166,9 @@ int main() {
     wortdarstellung(WortDarstell, strlen(Wort));
     //    printf("%s\n", WortDarstell);
     while (Fehler < 11|| Fehler == -1) {
-        darstellung();
+        MaleHangman();
         eingabe();
     }
-    darstellung();
-
-    //HangmanDarstellung
-
-    //Char eingeben
-    //char schon vorhanden?
-    //char
+    MaleHangman();
     return 1;
 }
