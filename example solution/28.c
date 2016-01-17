@@ -10,13 +10,7 @@ void clean_stdin(void) {
     } while (c != '\n' && c != EOF);
 }
 
-char * Words[10];
-int Fehler = 0;
-char * Wort;
-char * Gemachte;
-char * WortDarstell;
-
-void MaleHangman() {
+void darstellung(int Fehler, char * WortDarstell, char * gemachteChars) {
     printf("\n\n");
     if (Fehler >= 6) {
         printf("      ------\n");
@@ -65,7 +59,7 @@ void MaleHangman() {
     } else {
         printf("      |\t\t");
     }
-    printf("Falsch: %s", Gemachte);
+    printf("Falsch: %s", gemachteChars);
     printf("\n");
     //next 5
     if (Fehler < 3) {
@@ -96,28 +90,29 @@ void MaleHangman() {
     printf("==============\n\n");
 }
 
-void wortdarstellung(char * Worttemp, int lenght) {
+void wortdarstellung(char * WortDarstellung, char * gerateneChars, char * zuSuchendesWort, int * gemachteFehler) {
     int i = 0;
-    int leer = 0;
+    int lenght = strlen(WortDarstellung);
+    int leereFelder = 0;
     while (i < lenght) {
-        char temp = Wort[i];
+        char temp = zuSuchendesWort[i];
         if (temp == ' ') {
-            Worttemp[i] = ' ';
-        } else if (strchr(Gemachte, temp) == NULL) {
-            Worttemp[i] = '-';
-            leer++;
+            WortDarstellung[i] = ' ';
+        } else if (strchr(gerateneChars, temp) == NULL) {
+            WortDarstellung[i] = '-';
+            leereFelder++;
         } else {
-            Worttemp[i] = temp;
+            WortDarstellung[i] = temp;
         }
         i++;
     }
-    Worttemp[lenght] = '\0';
-    if(leer == 0){
-        Fehler = -1;
+    WortDarstellung[lenght] = '\0';
+    if (leereFelder == 0) {
+        *(gemachteFehler) = -1;
     }
 }
 
-void eingabe() {
+void eingabe(int * gemachteFehler, char * geratendeChars, char * zuSuchendesWort, char * wortDarstellung) {
     printf("Bitte einen Char eingeben: ");
     char a = '0';
     char * ch = malloc(2);
@@ -130,22 +125,27 @@ void eingabe() {
         if (ch[0] < 65 || ch[0] > 90) {
             printf("Bitte einen gueltigen Char eingeben: ");
         }
-        if (strchr(Gemachte, ch[0]) == NULL) {
+        if (strchr(geratendeChars, ch[0]) == NULL) {
             a = '1';
         } else {
             printf("Char schon eingegeben: ");
         }
     }
-    strncat(Gemachte, ch, 1);
-    if (strchr(Wort, ch[0]) == NULL) {
+    strncat(geratendeChars, ch, 1);
+    if (strchr(zuSuchendesWort, ch[0]) == NULL) {
         printf("Fehler char nicht im Wort enthalten!");
-        Fehler++;
+        (*gemachteFehler)++;
     } else {
-        wortdarstellung(WortDarstell, strlen(Wort));
+        wortdarstellung(wortDarstellung, geratendeChars, zuSuchendesWort, gemachteFehler);
     }
 }
 
 int main() {
+    int Fehler = 0;
+    char * Wort;
+    char * Gemachte;
+    char * WortDarstell;
+    char * Words[10];
     Gemachte = calloc(50, sizeof (char));
     Gemachte[0] = '\0';
     Words[0] = "TITANIC";
@@ -161,14 +161,15 @@ int main() {
 
     srand(time(NULL));
     Wort = Words[rand() % 10];
-    //    printf("%s\n", Wort);
     WortDarstell = calloc(strlen(Wort), 1);
-    wortdarstellung(WortDarstell, strlen(Wort));
-    //    printf("%s\n", WortDarstell);
-    while (Fehler < 11|| Fehler == -1) {
-        MaleHangman();
-        eingabe();
+    int i = 0;
+    for (i = 0; i < strlen(Wort); i++) {
+        WortDarstell[i] = '-';
     }
-    MaleHangman();
+    while (Fehler < 11 || Fehler == -1) {
+        darstellung(Fehler, WortDarstell, Gemachte);
+        eingabe(&Fehler, Gemachte, Wort, WortDarstell);
+    }
+    darstellung(Fehler, WortDarstell, Gemachte);
     return 1;
 }
